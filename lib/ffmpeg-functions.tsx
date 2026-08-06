@@ -174,9 +174,9 @@ async function applyMetadataCore(
         if (resultData.bpm) {
             metadataAtoms.tags['tmpo'] = Math.round(resultData.bpm);
         }
-        if (resultData.volume_number) {
+        if (resultData.media_number) {
             metadataAtoms.tags['disk'] = {
-                current: resultData.volume_number,
+                current: resultData.media_number,
                 total: resultData.album?.maximum_volume_number || resultData.album?.media_count || 0
             };
         }
@@ -210,9 +210,9 @@ async function applyMetadataCore(
     if (resultData.bpm) {
         metadata += `\nTBPM=${Math.round(resultData.bpm)}\nbpm=${Math.round(resultData.bpm)}`;
     }
-    if (resultData.volume_number) {
+    if (resultData.media_number) {
         const totalDiscs = resultData.album?.maximum_volume_number || resultData.album?.media_count || '';
-        metadata += `\ndisc=${resultData.volume_number}${totalDiscs ? '/' + totalDiscs : ''}`;
+        metadata += `\ndisc=${resultData.media_number}${totalDiscs ? '/' + totalDiscs : ''}`;
     }
 
     await ffmpeg.FS('writeFile', 'input.' + extension, new Uint8Array(trackBuffer));

@@ -182,17 +182,26 @@ function createUintAtom(key: string, value: number, intByteLength = 1) {
 }
 
 function createIntAtom(type: string, value: any) {
-    const dataSize = 24;
+    // Apple exige exactamente 6 bytes de payload para 'disk' y 8 bytes para 'trkn'
+    const payloadSize = type === 'disk' ? 6 : 8;
+    const dataSize = 16 + payloadSize;
     const atomSize = 8 + dataSize;
+    
     const buf = new Uint8Array(atomSize);
     writeAtomHeader(buf, 0, atomSize, type);
     writeAtomHeader(buf, 8, dataSize, 'data');
+    
     buf[16] = 0; buf[17] = 0; buf[18] = 0; buf[19] = 0;
+    
     const current = parseInt(typeof value === 'object' ? value.current : value) || 0;
     const total = parseInt(typeof value === 'object' ? value.total : 0) || 0;
+    
+    // Construcción binaria del payload
     buf[24] = 0; buf[25] = 0;
     buf[26] = (current >> 8) & 0xff; buf[27] = current & 0xff;
     buf[28] = (total >> 8) & 0xff; buf[29] = total & 0xff;
+    
+    // Si es 'trkn' (8 bytes), el Uint8Array ya dejó buf[30] y buf[31] en 0, cumpliendo el padding.
     return buf;
 }
 
